@@ -44,7 +44,7 @@ def read_images_recursively(directory):
 image_list = read_images_recursively('DS')
 
 
-def salt_pepper_noise(image, density):
+def add_salt_pepper_noise(image, density):
     density /= 5
     """
     input:
@@ -70,7 +70,7 @@ def salt_pepper_noise(image, density):
     return output
 
 
-def speckle_noise(image, variance):
+def add_speckle_noise(image, variance):
     # ایجاد نویز speckle
     noise = np.random.normal(0, variance, image.shape)
     speckle_noisy = image + image * noise
@@ -89,6 +89,18 @@ def add_poisson_noise(image, scale):
     return noisy_image
 
 
+def add_gaussian_noise(image, mean=0, std=0):
+    # تصویر را به float32 تبدیل می‌کنیم
+    img_float = np.float32(image)
+    # نویز گوسی را می‌سازیم
+    noise = np.random.normal(mean, std, image.shape)
+    noise = noise.astype(np.uint8)
+    # نویز را به تصویر اضافه می‌کنیم
+    noisy_image = cv2.add(image, noise)
+    # تصاویر را به بازه 0 تا 255 محدود می‌کنیم
+    noisy_image = np.clip(noisy_image, 0, 255)
+    return noisy_image
+
 def choose_noise_and_implement(noise_name, image):
     """
     :param noise_name:
@@ -98,17 +110,18 @@ def choose_noise_and_implement(noise_name, image):
     you some examples of implementation
     of noises on images
     """
-    if noise_name == "salt_and_pepper":
-        return salt_pepper_noise(image, 0.2)
-    if noise_name == "speckle":
-        return speckle_noise(image, 0.002)
-    if noise_name == "Possion":
-        return add_poisson_noise(image, 1.0)
-    if noise_name == "Gaussian":
-        pass
+    match noise_name:
+        case "salt_and_pepper":
+            return add_salt_pepper_noise(image, 0.05)
+        case "speckle":
+            return add_speckle_noise(image, 0.002)
+        case "Possion":
+            return add_poisson_noise(image, 1.0)
+        case "Gaussian":
+            return add_gaussian_noise(image, mean=10, std=25)
 
 
-def store_noisy_images(image_list: list):
+def store_noisy_images(image_list: list[list[np.ndarray]]):
     """
     Store noisy images according to :
     - densities
