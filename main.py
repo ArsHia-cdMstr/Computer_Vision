@@ -39,21 +39,33 @@ def read_images_recursively(directory):
         - Normal
         - RS
 
-    output : a dictionary with directories names as keys and gray scale images as values
+    output : a list which 1st Dimension is folder_count, and then it filled gray scale images
+        EX :
+            [
+                Med = 0 : [ image_0 , image_1 , image_2, .... ],
+                Normal = 1: [ image_0 , image_1, .....]],
+                RS = 2: [ image_0, .....]
+            ]
     """
-    images_dict = {}
+    images_dict = []
+    folder_count = 0
     for root, dirs, files in os.walk(directory):
         for dir in dirs:
             dir_path = os.path.join(root, dir)
-            images_dict[dir] = []  # ایجاد یک لیست برای نگهداری تصاویر هر فولدر
+            images_dict.append( [] )  # ایجاد یک لیست برای نگهداری تصاویر هر فولدر
+
             for file in os.listdir(dir_path):
                 if file.endswith(('.png', '.jpg', '.jpeg', '.bmp')):  # فرمت‌های تصویری که می‌خواهید بخوانید
                     file_path = os.path.join(dir_path, file)
                     image = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
-                    images_dict[dir].append(image)
+                    images_dict[folder_count].append(image)
+
+            folder_count += 1
     return images_dict
 
+image_list = read_images_recursively('DS')
 
-def use_all_noise(image_dic: dict[str, list], densities: tuple[int]):
-    image_dic
-    densities
+# def use_all_noise(image_dic: dict[str, list], densities: tuple[float]):
+#     image_dic['Med']
+#     densities
+#
